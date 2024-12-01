@@ -5,13 +5,13 @@ use burn::record::PrecisionSettings;
 use quote::quote;
 
 #[derive(Debug, Clone, new)]
-pub struct OnehotNode {
+pub struct OneHotNode {
     pub input: TensorType,
     pub output: TensorType,
     pub num_classes: usize,
 }
 
-impl<PS: PrecisionSettings> NodeCodegen<PS> for OnehotNode {
+impl<PS: PrecisionSettings> NodeCodegen<PS> for OneHotNode {
     fn output_types(&self) -> Vec<Type> {
         let mut output = self.output.clone();
         output.kind = TensorKind::Int;
@@ -54,7 +54,7 @@ mod tests {
     fn test_codegen_onehot() {
         let mut graph = BurnGraph::<FullPrecisionSettings>::default();
 
-        graph.register(OnehotNode::new(
+        graph.register(OneHotNode::new(
             TensorType::new_int("tensor1", 3),
             TensorType::new_int("tensor2", 5),
             5,

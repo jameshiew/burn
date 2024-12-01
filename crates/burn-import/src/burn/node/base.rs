@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use super::onehot::OnehotNode;
+use super::onehot::OneHotNode;
 use super::{
     argmax::ArgMaxNode, avg_pool1d::AvgPool1dNode, avg_pool2d::AvgPool2dNode,
     batch_norm::BatchNormNode, binary::BinaryNode, clip::ClipNode, concat::ConcatNode,
@@ -110,7 +110,7 @@ pub enum Node<PS: PrecisionSettings> {
     MaxPool1d(MaxPool1dNode),
     MaxPool2d(MaxPool2dNode),
     Mean(MeanNode),
-    Onehot(OnehotNode),
+    Onehot(OneHotNode),
     Pad(PadNode),
     Range(RangeNode),
     Reshape(ReshapeNode),
