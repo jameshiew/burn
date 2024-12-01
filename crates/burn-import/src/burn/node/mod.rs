@@ -27,6 +27,7 @@ pub(crate) mod matmul;
 pub(crate) mod max_pool1d;
 pub(crate) mod max_pool2d;
 pub(crate) mod mean;
+pub(crate) mod onehot;
 pub(crate) mod pad;
 pub(crate) mod prelu;
 pub(crate) mod random_normal;
@@ -44,7 +45,6 @@ pub(crate) mod trilu;
 pub(crate) mod unary;
 pub(crate) mod unsqueeze;
 pub(crate) use base::*;
-pub(crate) mod onehot;
 
 #[cfg(test)]
 pub(crate) mod test;
