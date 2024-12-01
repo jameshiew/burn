@@ -33,7 +33,7 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for OneHotNode {
         let output = &self.output.name;
 
         quote! {
-            let #output = #input.onehot(#num_classes);
+            let #output = #input.one_hot(#num_classes);
         }
     }
 
@@ -89,7 +89,7 @@ mod tests {
                     &self,
                     tensor1: Tensor<B, 3, Int>
                 ) -> Tensor<B, 5, Int> {
-                    let tensor2 = tensor1.onehot(5);
+                    let tensor2 = tensor1.one_hot(5);
 
                     tensor2
                 }
