@@ -27,7 +27,6 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for OnehotNode {
         scope: &mut crate::burn::Scope,
         node_position: usize,
     ) -> proc_macro2::TokenStream {
-        //NOTE: select_last_index and keep_dims are not supported
         let num_classes = self.num_classes.to_tokens();
 
         let input = scope.tensor_use_owned(&self.input, node_position);
@@ -56,9 +55,9 @@ mod tests {
         let mut graph = BurnGraph::<FullPrecisionSettings>::default();
 
         graph.register(OnehotNode::new(
-            TensorType::new_int("tensor1", 5),
+            TensorType::new_int("tensor1", 3),
             TensorType::new_int("tensor2", 5),
-            3,
+            5,
         ));
 
         graph.register_input_output(vec!["tensor1".to_string()], vec!["tensor2".to_string()]);
@@ -88,9 +87,9 @@ mod tests {
                 #[allow(clippy::let_and_return, clippy::approx_constant)]
                 pub fn forward(
                     &self,
-                    tensor1: Tensor<B, 2>
+                    tensor1: Tensor<B, 3, Int>
                 ) -> Tensor<B, 5, Int> {
-                    let tensor2 = tensor1.onehot(3);
+                    let tensor2 = tensor1.onehot(5);
 
                     tensor2
                 }
