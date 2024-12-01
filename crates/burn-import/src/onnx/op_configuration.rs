@@ -223,7 +223,7 @@ pub fn max_pool2d_config(curr: &Node) -> MaxPool2dConfig {
         .with_dilation([dilations[0] as usize, dilations[1] as usize])
 }
 
-pub fn onehot_config(node: &Node) -> usize {
+pub fn one_hot_config(node: &Node) -> usize {
     let mut axis: i64 = 0;
 
     // check if the node has only one input

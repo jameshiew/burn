@@ -19,7 +19,7 @@ def main():
     model = Model(num_classes=5)
     model.eval()
     device = torch.device("cpu")
-    onnx_name = "onehot.onnx"
+    onnx_name = "one_hot.onnx"
     
     dummy_input = torch.tensor([0, 2, 3], device=device)
     
