@@ -41,7 +41,7 @@ use crate::{
             matmul::MatmulNode,
             max_pool1d::MaxPool1dNode,
             max_pool2d::MaxPool2dNode,
-            onehot::OnehotNode,
+            onehot::OneHotNode,
             pad::PadNode,
             prelu::PReluNode,
             random_normal::RandomNormalNode,
@@ -556,12 +556,12 @@ impl ParsedOnnxGraph {
         ConstantOfShapeNode::new(input, output, value)
     }
 
-    fn onehot_conversion(node: Node) -> OnehotNode {
+    fn onehot_conversion(node: Node) -> OneHotNode {
         let input = TensorType::from(node.inputs.first().unwrap());
         let output = TensorType::from(node.outputs.first().unwrap());
         let axis = onehot_config(&node);
 
-        OnehotNode::new(input, output, axis)
+        OneHotNode::new(input, output, axis)
     }
 
     fn add_conversion(node: Node) -> BinaryNode {
