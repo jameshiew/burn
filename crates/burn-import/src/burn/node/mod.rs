@@ -44,6 +44,7 @@ pub(crate) mod trilu;
 pub(crate) mod unary;
 pub(crate) mod unsqueeze;
 pub(crate) use base::*;
+pub(crate) mod onehot;
 
 #[cfg(test)]
 pub(crate) mod test;

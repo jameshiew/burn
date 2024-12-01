@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 
+use super::onehot::OnehotNode;
 use super::{
     argmax::ArgMaxNode, avg_pool1d::AvgPool1dNode, avg_pool2d::AvgPool2dNode,
     batch_norm::BatchNormNode, binary::BinaryNode, clip::ClipNode, concat::ConcatNode,
@@ -109,6 +110,7 @@ pub enum Node<PS: PrecisionSettings> {
     MaxPool1d(MaxPool1dNode),
     MaxPool2d(MaxPool2dNode),
     Mean(MeanNode),
+    Onehot(OnehotNode),
     Pad(PadNode),
     Range(RangeNode),
     Reshape(ReshapeNode),
@@ -161,6 +163,7 @@ macro_rules! match_all {
             Node::MaxPool1d(node) => $func(node),
             Node::MaxPool2d(node) => $func(node),
             Node::Mean(node) => $func(node),
+            Node::Onehot(node) => $func(node),
             Node::Pad(node) => $func(node),
             Node::Range(node) => $func(node),
             Node::Reshape(node) => $func(node),
@@ -221,6 +224,7 @@ impl<PS: PrecisionSettings> Node<PS> {
             Node::MaxPool1d(_) => "max_pool1d",
             Node::MaxPool2d(_) => "max_pool2d",
             Node::Mean(_) => "mean",
+            Node::Onehot(_) => "onehot",
             Node::Pad(_) => "pad",
             Node::Range(_) => "range",
             Node::Reshape(_) => "reshape",
