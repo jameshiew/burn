@@ -558,15 +558,9 @@ impl ParsedOnnxGraph {
 
     fn one_hot_conversion(node: Node) -> OneHotNode {
         let input = TensorType::from(node.inputs.first().expect("first input should be a tensor"));
-        if input.kind != TensorKind::Int || input.dim != 1 {
-            panic!("first input should be a 1D int tensor");
-        }
         let num_classes =
             convert_arg_to_scalar(node.inputs.get(1).expect("second input should be a scalar"));
         let output = TensorType::from(node.outputs.first().expect("output should be a tensor"));
-        if output.kind != TensorKind::Int || output.dim != 2 {
-            panic!("output should be a 2D int tensor");
-        }
 
         OneHotNode::new(input, num_classes, output)
     }
