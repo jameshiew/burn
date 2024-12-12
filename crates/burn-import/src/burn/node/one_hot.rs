@@ -39,7 +39,7 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for OneHotNode {
     }
 
     fn into_node(self) -> super::Node<PS> {
-        Node::Onehot(self)
+        Node::OneHot(self)
     }
 }
 
@@ -54,7 +54,7 @@ mod tests {
     };
 
     #[test]
-    fn test_codegen_onehot() {
+    fn test_codegen_one_hot() {
         let mut graph = BurnGraph::<FullPrecisionSettings>::default();
 
         graph.register(OneHotNode::new(
