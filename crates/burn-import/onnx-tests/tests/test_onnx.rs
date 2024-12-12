@@ -550,6 +550,20 @@ mod tests {
     }
 
     #[test]
+    fn one_hot() {
+        // Initialize the model with weights (loaded from the exported file)
+        let model: one_hot::Model<Backend> = one_hot::Model::default();
+
+        let device = Default::default();
+        // Run the model
+        let input = Tensor::<Backend, 1, Int>::from_ints([1, 4, 2], &device);
+        let output = model.forward(input);
+        let expected = TensorData::from([[0i64, 1, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 0]]);
+
+        output.to_data().assert_eq(&expected, true);
+    }
+
+    #[test]
     fn globalavrpool_1d_2d() {
         // The model contains 1d and 2d global average pooling nodes
         let model: global_avr_pool::Model<Backend> = global_avr_pool::Model::default();
