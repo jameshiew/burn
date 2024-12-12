@@ -7,6 +7,7 @@ use crate::tensor::{Distribution, Tensor};
 
 use crate as burn;
 
+use burn_tensor::{Float, Int};
 #[cfg(not(feature = "std"))]
 use num_traits::Float;
 
@@ -69,6 +70,48 @@ pub enum Initializer {
         gain: f64,
     },
 }
+
+pub fn zeros_int<B: Backend, const D: usize, S: Into<Shape>>(
+    shape: S,
+    device: &B::Device,
+) -> Param<Tensor<B, D, Int>> {
+    let device = device.clone();
+    let shape: Shape = shape.into();
+    Param::uninitialized(
+        ParamId::new(),
+        move |device, _require_grad| Tensor::<B, D, Int>::zeros(shape.clone(), device),
+        device,
+        true,
+    )
+}
+
+pub fn zeros_float<B: Backend, const D: usize, S: Into<Shape>>(
+    shape: S,
+    device: &B::Device,
+) -> Param<Tensor<B, D, Float>> {
+    let device = device.clone();
+    let shape: Shape = shape.into();
+    Param::uninitialized(
+        ParamId::new(),
+        move |device, _require_grad| Tensor::<B, D, Float>::zeros(shape.clone(), device),
+        device,
+        true,
+    )
+}
+
+// pub fn zeros_bool<B: Backend, const D: usize, S: Into<Shape>>(
+//     shape: S,
+//     device: &B::Device,
+// ) -> Param<Tensor<B, D, Bool>> {
+//     let device = device.clone();
+//     let shape: Shape = shape.into();
+//     Param::uninitialized(
+//         ParamId::new(),
+//         move |device, _require_grad| Tensor::<B, D, Bool>::zeros(shape.clone(), device),
+//         device,
+//         true,
+//     )
+// }
 
 impl Initializer {
     /// Inits a tensor parameter of given shape with values depending on initializer kind.

@@ -6,12 +6,12 @@ import torch
 import torch.nn as nn
 
 class Model(nn.Module):
-    def __init__(self, num_classes: int = 5):
+    def __init__(self, num_classes: int):
         super(Model, self).__init__()
         self._num_classes = num_classes
 
     def forward(self, indices):
-        y = torch.nn.functional.one_hot(indices.long(), num_classes=self._num_classes)
+        y = torch.nn.functional.one_hot(indices, num_classes=self._num_classes)
         return y
 
 def main():
@@ -24,7 +24,7 @@ def main():
     dummy_input = torch.tensor([0, 2, 3], device=device)
     
     torch.onnx.export(model, dummy_input, onnx_name,
-                     verbose=False, opset_version=16)
+                     verbose=False, opset_version=16, do_constant_folding=False)
     
     print(f"Finished exporting model to {onnx_name}")
 
