@@ -223,36 +223,6 @@ pub fn max_pool2d_config(curr: &Node) -> MaxPool2dConfig {
         .with_dilation([dilations[0] as usize, dilations[1] as usize])
 }
 
-pub fn one_hot_config(node: &Node) -> usize {
-    let mut axis: i64 = 0;
-
-    // check if the node has only one input
-    if node.inputs.len() != 3 {
-        panic!("Onehot: expected 3 inputs (got {:?})", node.inputs.len());
-    }
-
-    // extract the shape of the input tensor
-    let tensor = match node.inputs.first().unwrap().clone().ty {
-        ArgType::Tensor(tensor) => tensor,
-        _ => panic!("Only tensor input is valid"),
-    };
-
-    // extract the attributes
-    for (key, value) in node.attrs.iter() {
-        match key.as_str() {
-            "axis" => axis = value.clone().into_i64(),
-            _ => {}
-        }
-    }
-
-    // if axis is negative, it is counted from the end
-    if axis < 0 {
-        axis += tensor.dim as i64;
-    }
-
-    axis as usize
-}
-
 pub fn conv_transpose1d_config(curr: &Node) -> ConvTranspose1dConfig {
     let mut attrs = curr.attrs.clone();
 

@@ -70,8 +70,8 @@ use super::op_configuration::{
     concat_config, conv1d_config, conv2d_config, conv3d_config, conv_transpose1d_config,
     conv_transpose2d_config, conv_transpose3d_config, dropout_config, expand_config,
     flatten_config, gather_config, hard_sigmoid_config, layer_norm_config, leaky_relu_config,
-    linear_config, log_softmax_config, max_pool1d_config, max_pool2d_config, one_hot_config,
-    pad_config, reduce_max_config, reduce_mean_config, reduce_min_config, reduce_prod_config,
+    linear_config, log_softmax_config, max_pool1d_config, max_pool2d_config, pad_config,
+    reduce_max_config, reduce_mean_config, reduce_min_config, reduce_prod_config,
     reduce_sum_config, reshape_config, resize_config, shape_config, slice_config, softmax_config,
     squeeze_config, tile_config, transpose_config, trilu_config, unsqueeze_config,
 };
@@ -557,11 +557,26 @@ impl ParsedOnnxGraph {
     }
 
     fn one_hot_conversion(node: Node) -> OneHotNode {
+        fn convert_arg_to_scalar(arg: &OnnxArgument) -> ScalarType {
+            match &arg.ty {
+                ArgType::Scalar(scalar) => {
+                    ScalarType::new(arg.name.clone(), ScalarKind::from(scalar))
+                }
+                ArgType::Tensor(tensor) => {
+                    if tensor.dim != 0 {
+                        panic!("Range node requires scalar inputs");
+                    }
+                    ScalarType::new(arg.name.clone(), ScalarKind::from(&tensor.elem_type))
+                }
+                _ => panic!("Range node requires scalar inputs"),
+            }
+        }
         let input = TensorType::from(node.inputs.first().unwrap());
+        let num_classes = convert_arg_to_scalar(node.inputs.get(1).unwrap());
         let output = TensorType::from(node.outputs.first().unwrap());
-        let axis = one_hot_config(&node);
+        // let axis = one_hot_config(&node);
 
-        OneHotNode::new(input, output, axis)
+        OneHotNode::new(input, num_classes, output)
     }
 
     fn add_conversion(node: Node) -> BinaryNode {

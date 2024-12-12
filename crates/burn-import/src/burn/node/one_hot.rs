@@ -1,5 +1,5 @@
 use super::{Node, NodeCodegen};
-use crate::burn::{TensorKind, TensorType, ToTokens, Type};
+use crate::burn::{ScalarType, TensorType, Type};
 
 use burn::record::PrecisionSettings;
 use quote::quote;
@@ -7,19 +7,20 @@ use quote::quote;
 #[derive(Debug, Clone, new)]
 pub struct OneHotNode {
     pub input: TensorType,
+    pub num_classes: ScalarType,
     pub output: TensorType,
-    pub num_classes: usize,
 }
 
 impl<PS: PrecisionSettings> NodeCodegen<PS> for OneHotNode {
     fn output_types(&self) -> Vec<Type> {
-        let mut output = self.output.clone();
-        output.kind = TensorKind::Int;
-        vec![Type::Tensor(output)]
+        vec![Type::Tensor(self.output.clone())]
     }
 
     fn input_types(&self) -> Vec<crate::burn::Type> {
-        vec![Type::Tensor(self.input.clone())]
+        vec![
+            Type::Tensor(self.input.clone()),
+            Type::Scalar(self.num_classes.clone()),
+        ]
     }
 
     fn forward(
@@ -27,13 +28,13 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for OneHotNode {
         scope: &mut crate::burn::Scope,
         node_position: usize,
     ) -> proc_macro2::TokenStream {
-        let num_classes = self.num_classes.to_tokens();
+        let num_classes = &self.num_classes.name;
 
         let input = scope.tensor_use_owned(&self.input, node_position);
         let output = &self.output.name;
 
         quote! {
-            let #output = #input.one_hot(#num_classes);
+            let #output = #input.one_hot(#num_classes as usize);
         }
     }
 
@@ -48,19 +49,24 @@ mod tests {
     use burn::record::FullPrecisionSettings;
 
     use super::*;
-    use crate::burn::{graph::BurnGraph, node::test::assert_tokens, TensorType};
+    use crate::burn::{
+        graph::BurnGraph, node::test::assert_tokens, ScalarKind, ScalarType, TensorType,
+    };
 
     #[test]
     fn test_codegen_onehot() {
         let mut graph = BurnGraph::<FullPrecisionSettings>::default();
 
         graph.register(OneHotNode::new(
-            TensorType::new_int("tensor1", 3),
-            TensorType::new_int("tensor2", 5),
-            5,
+            TensorType::new_int("input", 1),
+            ScalarType::new("num_classes", ScalarKind::Int64),
+            TensorType::new_int("output", 2),
         ));
 
-        graph.register_input_output(vec!["tensor1".to_string()], vec!["tensor2".to_string()]);
+        graph.register_input_output(
+            vec!["input".to_string(), "num_classes".to_string()],
+            vec!["output".to_string()],
+        );
 
         let expected = quote! {
             use burn::tensor::Int;
@@ -87,11 +93,12 @@ mod tests {
                 #[allow(clippy::let_and_return, clippy::approx_constant)]
                 pub fn forward(
                     &self,
-                    tensor1: Tensor<B, 3, Int>
-                ) -> Tensor<B, 5, Int> {
-                    let tensor2 = tensor1.one_hot(5);
-
-                    tensor2
+                    input: Tensor<B, 1, Int>,
+                    num_classes: i64,
+                    constants: Tensor<B, 1, Int>,
+                ) -> Tensor<B, 2, Int> {
+                    let output = input.one_hot(num_classes as usize);
+                    output
                 }
             }
         };
