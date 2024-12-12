@@ -94,8 +94,7 @@ mod tests {
                 pub fn forward(
                     &self,
                     input: Tensor<B, 1, Int>,
-                    num_classes: i64,
-                    constants: Tensor<B, 1, Int>,
+                    num_classes: i64
                 ) -> Tensor<B, 2, Int> {
                     let output = input.one_hot(num_classes as usize);
                     output
