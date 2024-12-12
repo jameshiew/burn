@@ -7,7 +7,6 @@ use crate::tensor::{Distribution, Tensor};
 
 use crate as burn;
 
-use burn_tensor::{Float, Int};
 #[cfg(not(feature = "std"))]
 use num_traits::Float;
 
@@ -71,29 +70,33 @@ pub enum Initializer {
     },
 }
 
+/// Placeholder docstring
 pub fn zeros_int<B: Backend, const D: usize, S: Into<Shape>>(
     shape: S,
     device: &B::Device,
-) -> Param<Tensor<B, D, Int>> {
+) -> Param<Tensor<B, D, burn_tensor::Int>> {
     let device = device.clone();
     let shape: Shape = shape.into();
     Param::uninitialized(
         ParamId::new(),
-        move |device, _require_grad| Tensor::<B, D, Int>::zeros(shape.clone(), device),
+        move |device, _require_grad| Tensor::<B, D, burn_tensor::Int>::zeros(shape.clone(), device),
         device,
         true,
     )
 }
 
+/// Placeholder docstring
 pub fn zeros_float<B: Backend, const D: usize, S: Into<Shape>>(
     shape: S,
     device: &B::Device,
-) -> Param<Tensor<B, D, Float>> {
+) -> Param<Tensor<B, D, burn_tensor::Float>> {
     let device = device.clone();
     let shape: Shape = shape.into();
     Param::uninitialized(
         ParamId::new(),
-        move |device, _require_grad| Tensor::<B, D, Float>::zeros(shape.clone(), device),
+        move |device, _require_grad| {
+            Tensor::<B, D, burn_tensor::Float>::zeros(shape.clone(), device)
+        },
         device,
         true,
     )
