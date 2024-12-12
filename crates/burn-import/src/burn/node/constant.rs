@@ -129,7 +129,7 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for ConstantNode {
                         let #name: burn::module::Param<#ty> = burn::nn::zeros_float(#shape, device);
                     }),
                     crate::burn::TensorKind::Bool => Some(quote! {
-                        let #name: burn::module::Param<#ty> = burn::nn::Initializer::Zeros.init(#shape, device).set_require_grad(false);
+                        let #name: burn::module::Param<#ty> = burn::nn::zeros_bool(#shape, device);
                     }),
                 }
             }
