@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# used to generate model: onnx-tests/tests/onehot/onehot.onnx
+# used to generate model: onnx-tests/tests/one_hot/one_hot.onnx
 
 import torch
 import torch.nn as nn
