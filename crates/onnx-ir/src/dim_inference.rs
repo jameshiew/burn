@@ -519,7 +519,12 @@ fn temporary_pass_through_stub(node: &mut Node) {
 }
 
 fn one_hot_outputs(node: &mut Node) {
-    let ArgType::Tensor(TensorType { dim: input_dim, .. }) = &node.inputs[0].ty else {
+    let ArgType::Tensor(TensorType {
+        dim: input_dim,
+        elem_type: input_elem_type,
+        ..
+    }) = &node.inputs[0].ty
+    else {
         panic!("OneHot: input must be a tensor");
     };
     let ArgType::Tensor(output_tensor) = &node.outputs[0].ty else {
@@ -527,6 +532,7 @@ fn one_hot_outputs(node: &mut Node) {
     };
     node.outputs[0].ty = ArgType::Tensor(TensorType {
         dim: input_dim + 1,
+        elem_type: input_elem_type.clone(),
         ..output_tensor.clone()
     });
 }
