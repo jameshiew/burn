@@ -39,6 +39,7 @@ pub fn dim_inference(node: &mut Node) {
         NodeType::Greater => elementwise_comparison_outputs(node),
         NodeType::GreaterOrEqual => elementwise_comparison_outputs(node),
         NodeType::HardSigmoid => same_as_input(node),
+        NodeType::OneHot => one_hot_outputs(node),
         NodeType::GlobalAveragePool => same_as_input(node),
         NodeType::ConvTranspose1d => conv_transpose1d_update_outputs(node),
         NodeType::ConvTranspose2d => conv_transpose2d_update_outputs(node),
@@ -515,6 +516,25 @@ fn temporary_pass_through_stub(node: &mut Node) {
     log::warn!("Must implement dimension inference for {:?}", node);
     log::warn!("Temporarily setting the output type to the input type.");
     node.outputs[0].ty = node.inputs[0].ty.clone();
+}
+
+fn one_hot_outputs(node: &mut Node) {
+    let ArgType::Tensor(TensorType {
+        dim: input_dim,
+        elem_type: input_elem_type,
+        ..
+    }) = &node.inputs[0].ty
+    else {
+        panic!("OneHot: input must be a tensor");
+    };
+    let ArgType::Tensor(output_tensor) = &node.outputs[0].ty else {
+        panic!("OneHot: output must be a tensor");
+    };
+    node.outputs[0].ty = ArgType::Tensor(TensorType {
+        dim: input_dim + 1,
+        elem_type: input_elem_type.clone(),
+        ..output_tensor.clone()
+    });
 }
 
 /// Sets the output for binary operators resulting in a boolean output,
