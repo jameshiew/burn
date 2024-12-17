@@ -31,6 +31,8 @@ include_models!(
     constant_i64,
     constant_tensor_f32,
     constant_tensor_f64,
+    // constant_tensor_i32,
+    // constant_tensor_i64,
     constant_of_shape,
     constant_of_shape_full_like,
     conv1d,

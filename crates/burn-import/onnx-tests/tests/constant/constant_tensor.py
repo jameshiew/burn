@@ -49,6 +49,14 @@ def main():
     f64_input = torch.randn(CONST_SHAPE, dtype=torch.float64, device=device)
     export_model(model_f64, f64_input, "constant_tensor_f64.onnx")
 
+    model_i32 = ConstantTensorModel(torch.int32)
+    i32_input = torch.randint(low=-10, high=10, size=CONST_SHAPE, device=device, dtype=torch.int32)
+    export_model(model_i32, i32_input, "constant_tensor_i32.onnx")
+
+    model_i64 = ConstantTensorModel(torch.int64)
+    i64_input = torch.randint(low=-10, high=10, size=CONST_SHAPE, device=device, dtype=torch.int64)
+    export_model(model_i64, i64_input, "constant_tensor_i64.onnx")
+
 
 if __name__ == "__main__":
     main()
