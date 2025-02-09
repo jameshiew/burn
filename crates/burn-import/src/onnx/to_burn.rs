@@ -41,6 +41,7 @@ use crate::{
             matmul::MatmulNode,
             max_pool1d::MaxPool1dNode,
             max_pool2d::MaxPool2dNode,
+            one_hot::OneHotNode,
             pad::PadNode,
             prelu::PReluNode,
             random_normal::RandomNormalNode,
@@ -275,6 +276,7 @@ impl ParsedOnnxGraph {
                 NodeType::Max => graph.register(Self::max_conversion(node)),
                 NodeType::MaxPool1d => graph.register(Self::max_pool1d_conversion(node)),
                 NodeType::MaxPool2d => graph.register(Self::max_pool2d_conversion(node)),
+                NodeType::OneHot => graph.register(Self::one_hot_conversion(node)),
                 NodeType::Mean => graph.register(Self::mean_conversion(node)),
                 NodeType::PRelu => graph.register(Self::prelu_conversion::<PS>(node)),
                 NodeType::AveragePool1d => graph.register(Self::avg_pool_1d_conversion(node)),
@@ -554,6 +556,15 @@ impl ParsedOnnxGraph {
         ConstantOfShapeNode::new(input, output, value)
     }
 
+    fn one_hot_conversion(node: Node) -> OneHotNode {
+        let input = TensorType::from(node.inputs.first().expect("first input should be a tensor"));
+        let num_classes =
+            convert_arg_to_scalar(node.inputs.get(1).expect("second input should be a scalar"));
+        let output = TensorType::from(node.outputs.first().expect("output should be a tensor"));
+
+        OneHotNode::new(input, num_classes, output)
+    }
+
     fn add_conversion(node: Node) -> BinaryNode {
         let lhs = Type::from(node.inputs.first().unwrap());
         let rhs = Type::from(node.inputs.get(1).unwrap());
@@ -724,20 +735,6 @@ impl ParsedOnnxGraph {
     }
 
     fn range_conversion(node: Node) -> RangeNode {
-        fn convert_arg_to_scalar(arg: &OnnxArgument) -> ScalarType {
-            match &arg.ty {
-                ArgType::Scalar(scalar) => {
-                    ScalarType::new(arg.name.clone(), ScalarKind::from(scalar))
-                }
-                ArgType::Tensor(tensor) => {
-                    if tensor.dim != 0 {
-                        panic!("Range node requires scalar inputs");
-                    }
-                    ScalarType::new(arg.name.clone(), ScalarKind::from(&tensor.elem_type))
-                }
-                _ => panic!("Range node requires scalar inputs"),
-            }
-        }
         let output = TensorType::from(node.outputs.first().unwrap());
         let start = convert_arg_to_scalar(node.inputs.first().unwrap());
         let end = convert_arg_to_scalar(node.inputs.get(1).unwrap());
@@ -1386,5 +1383,18 @@ impl From<ElementType> for TensorKind {
             ElementType::Bool => TensorKind::Bool,
             _ => panic!("Unsupported tensor type"),
         }
+    }
+}
+
+fn convert_arg_to_scalar(arg: &OnnxArgument) -> ScalarType {
+    match &arg.ty {
+        ArgType::Scalar(scalar) => ScalarType::new(arg.name.clone(), ScalarKind::from(scalar)),
+        ArgType::Tensor(tensor) => {
+            if tensor.dim != 0 {
+                panic!("Range node requires scalar inputs");
+            }
+            ScalarType::new(arg.name.clone(), ScalarKind::from(&tensor.elem_type))
+        }
+        _ => panic!("Range node requires scalar inputs"),
     }
 }
